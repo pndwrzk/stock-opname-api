@@ -1,4 +1,4 @@
-import { AuthUser } from "../utils/token";
+import { AuthUser } from "./auth";
 
 declare global {
   namespace Express {
@@ -7,5 +7,4 @@ declare global {
     }
   }
 }
-
 export {};

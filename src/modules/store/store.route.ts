@@ -18,7 +18,10 @@ router
 router
   .route("/:id")
   .get(validate({ params: storeIdParamSchema }), storeController.findById)
-  .patch(validate({ params: storeIdParamSchema, body: updateStoreSchema }), storeController.update)
+  .patch(
+    validate({ params: storeIdParamSchema, body: updateStoreSchema }),
+    storeController.update,
+  )
   .delete(validate({ params: storeIdParamSchema }), storeController.remove);
 
 export default router;

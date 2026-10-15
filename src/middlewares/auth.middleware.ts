@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError";
 import { verifyAccessToken } from "../utils/token";
+import { AuthUser } from "../types/auth";
 
 export const authenticate = (req: Request, _res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
@@ -9,7 +10,7 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction) =
   }
 
   try {
-    req.user = verifyAccessToken(header.slice(7));
+    req.user = verifyAccessToken(header.slice(7)) as AuthUser;
     next();
   } catch {
     next(new ApiError(401, "Invalid or expired access token"));
