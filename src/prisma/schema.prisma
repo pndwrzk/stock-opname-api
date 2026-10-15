@@ -34,9 +34,8 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   store Store? @relation(fields: [storeId], references: [id], onDelete: Restrict)
-  initiatedOpnames StockOpname[] @relation("OpnameInitiator")
-  submittedOpnames StockOpname[] @relation("OpnameSubmitter")
-  approvedOpnames  StockOpname[] @relation("OpnameApprover")
+  initiatedOpnames StockOpname[]    @relation("OpnameInitiator")
+  opnameHistories       StockOpnameHistory[] @relation("OpnameHistoryUser")
 
   @@index([storeId])
   @@map("users")
@@ -73,28 +72,40 @@ model StoreStock {
 }
 
 model StockOpname {
-  id          String    @id @default(uuid()) @db.Uuid
-  storeId     String    @map("store_id") @db.Uuid
-  scope       Int       @db.SmallInt
-  status      Int       @default(0) @db.SmallInt
-  note        String?   @db.Text
-  initiatedBy String    @map("initiated_by") @db.Uuid
-  submittedBy String?   @map("submitted_by") @db.Uuid
-  approvedBy  String?   @map("approved_by") @db.Uuid
-  initiatedAt DateTime  @default(now()) @map("initiated_at")
-  submittedAt DateTime? @map("submitted_at")
-  approvedAt  DateTime? @map("approved_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id          String   @id @default(uuid()) @db.Uuid
+  storeId     String   @map("store_id") @db.Uuid
+  scope       Int      @db.SmallInt
+  status      Int      @default(0) @db.SmallInt
+  note        String?  @db.Text
+  initiatedBy String   @map("initiated_by") @db.Uuid
+  initiatedAt DateTime @default(now()) @map("initiated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  store     Store  @relation(fields: [storeId], references: [id], onDelete: Restrict)
-  initiator User   @relation("OpnameInitiator", fields: [initiatedBy], references: [id], onDelete: Restrict)
-  submitter User?  @relation("OpnameSubmitter", fields: [submittedBy], references: [id], onDelete: Restrict)
-  approver  User?  @relation("OpnameApprover", fields: [approvedBy], references: [id], onDelete: Restrict)
+  store     Store             @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  initiator User              @relation("OpnameInitiator", fields: [initiatedBy], references: [id], onDelete: Restrict)
   items     StockOpnameItem[]
+  histories       StockOpnameHistory[]
 
   @@index([storeId, status])
   @@map("stock_opnames")
+}
+
+model StockOpnameHistory {
+  id         String   @id @default(uuid()) @db.Uuid
+  opnameId   String   @map("opname_id") @db.Uuid
+  fromStatus Int?     @map("from_status") @db.SmallInt
+  toStatus   Int      @map("to_status") @db.SmallInt
+  userId    String   @map("user_id") @db.Uuid
+  note       String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  opname StockOpname @relation(fields: [opnameId], references: [id], onDelete: Cascade)
+  user  User        @relation("OpnameHistoryUser", fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([opnameId, createdAt])
+  @@index([userId])
+  @@map("stock_opname_histories")
 }
 
 model StockOpnameItem {
