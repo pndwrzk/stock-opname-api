@@ -7,7 +7,7 @@ const userInclude = {
   store: { select: { id: true, code: true, name: true } },
 } satisfies Prisma.UserInclude;
 
-// password tidak pernah ikut keluar kecuali lewat findByUsername (khusus login)
+
 const safeOmit = { password: true } satisfies Prisma.UserOmit;
 
 export type UserWithStore = Prisma.UserGetPayload<{
@@ -16,6 +16,15 @@ export type UserWithStore = Prisma.UserGetPayload<{
 }>;
 
 export const userRepository = {
+  count(storeId?: string): Promise<number> {
+    return prisma.user.count({
+      where: {
+        role: { not: ROLES.OWNER },
+        ...(storeId && { storeId }),
+      },
+    });
+  },
+
   // dto.password harus sudah di-hash oleh service
   create(data: CreateUserDto): Promise<UserWithStore> {
     return prisma.user.create({
@@ -50,6 +59,8 @@ export const userRepository = {
         ],
       }),
     };
+
+    where.role = { not: ROLES.OWNER }; 
 
     const [items, total] = await prisma.$transaction([
       prisma.user.findMany({

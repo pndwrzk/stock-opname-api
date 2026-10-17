@@ -1,3 +1,5 @@
+import { ROLES } from "../../constants/roles";
+import { AuthUser } from "../../types/auth";
 import { ApiError } from "../../utils/ApiError";
 import { CreateStoreDto, ListStoreQuery, UpdateStoreDto } from "./store.interface";
 import { storeRepository } from "./store.repository";
@@ -16,6 +18,11 @@ const assertCodeAvailable = async (code: string, exceptId?: string) => {
 };
 
 export const storeService = {
+  async count() {
+   
+    return { total: await storeRepository.count() };
+  },
+
   async create(dto: CreateStoreDto) {
     await assertCodeAvailable(dto.code);
     return storeRepository.create(dto);

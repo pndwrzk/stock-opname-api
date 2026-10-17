@@ -10,6 +10,8 @@ import {
 
 const router = Router();
 
+router.get("/count", productController.count);
+
 router
   .route("/")
   .get(validate({ query: listProductQuerySchema }), productController.findAll)

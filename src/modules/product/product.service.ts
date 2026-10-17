@@ -1,6 +1,10 @@
 import { Product } from "@prisma/client";
 import { ApiError } from "../../utils/ApiError";
-import { CreateProductDto, ListProductQuery, UpdateProductDto } from "./product.interface";
+import {
+  CreateProductDto,
+  ListProductQuery,
+  UpdateProductDto,
+} from "./product.interface";
 import { productRepository } from "./product.repository";
 
 const getOrFail = async (id: string): Promise<Product> => {
@@ -17,6 +21,10 @@ const assertSkuAvailable = async (sku: string, exceptId?: string) => {
 };
 
 export const productService = {
+  async count() {
+    return { total: await productRepository.count() };
+  },
+
   async create(dto: CreateProductDto): Promise<Product> {
     await assertSkuAvailable(dto.sku);
     return productRepository.create(dto);

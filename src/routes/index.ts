@@ -14,7 +14,7 @@ const router = Router();
 router.use("/auth", authRoutes);
 router.use("/stores", authenticate,storeRoutes);
 router.use("/products",authenticate, productRoutes);
-router.use("/users", userRoutes);
+router.use("/users",authenticate, userRoutes);
 router.use("/store-stocks", authenticate, storeStockRoutes);
 router.use("/stock-opnames", authenticate, stockOpnameRoutes);
 

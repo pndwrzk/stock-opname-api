@@ -5,13 +5,18 @@ import { ListUserQuery } from "./user.interface";
 import { userService } from "./user.service";
 
 export const userController = {
+  count: catchAsync(async (req: Request, res: Response) => {
+    const result = await userService.count(req.user!!);
+    sendSuccess(res, result, "Users count retrieved");
+  }),
+
   create: catchAsync(async (req: Request, res: Response) => {
-    const user = await userService.create(req.body);
+    const user = await userService.create(req.user!!,req.body);
     sendSuccess(res, user, "User created", 201);
   }),
 
   findAll: catchAsync(async (req: Request, res: Response) => {
-    const { items, meta } = await userService.findAll(req.query as unknown as ListUserQuery);
+    const { items, meta } = await userService.findAll(req.user!!, req.query as unknown as ListUserQuery);
     sendSuccess(res, items, "Users retrieved", 200, meta);
   }),
 

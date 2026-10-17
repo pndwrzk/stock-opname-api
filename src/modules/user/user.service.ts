@@ -4,6 +4,7 @@ import { ApiError } from "../../utils/ApiError";
 import { hashPassword } from "../../utils/password";
 import { CreateUserDto, ListUserQuery, UpdateUserDto } from "./user.interface";
 import { userRepository, UserWithStore } from "./user.repository";
+import { AuthUser } from "../../types/auth";
 
 const getOrFail = async (id: string): Promise<UserWithStore> => {
   const user = await userRepository.findById(id);
@@ -43,7 +44,24 @@ const assertRoleStoreRule = async (role: Role, storeId: string | null, exceptUse
 };
 
 export const userService = {
-  async create(dto: CreateUserDto): Promise<UserWithStore> {
+  async count(actor: AuthUser) {
+    let storeId: string | undefined;
+    if (actor.role === ROLES.MANAGER || actor.role === ROLES.STAFF) {
+      if (!actor.storeId) {
+        throw new ApiError(403, "You are not authorized to view users");
+      }
+      storeId = actor.storeId;
+    }
+    return { total: await userRepository.count(storeId) };
+  },
+
+  async create(actor: AuthUser, dto: CreateUserDto): Promise<UserWithStore> {
+    if (actor.role === ROLES.MANAGER) {
+      if (!actor.storeId || actor.storeId !== dto.storeId) {
+        throw new ApiError(403, "You are not authorized to create user for this store");
+      }
+    }
+
     await assertNikAvailable(dto.nik);
     await assertUsernameAvailable(dto.username);
     await assertRoleStoreRule(dto.role, dto.storeId ?? null);
@@ -52,7 +70,15 @@ export const userService = {
     return userRepository.create({ ...dto, password });
   },
 
-  async findAll(query: ListUserQuery) {
+  async findAll(actor: AuthUser, query: ListUserQuery) {
+
+    if (actor.role === ROLES.MANAGER || actor.role === ROLES.STAFF) {
+      if (!actor.storeId) {
+        throw new ApiError(403, "You are not authorized to view users");
+      }
+      query.storeId = actor.storeId;
+    }
+    
     const { items, total } = await userRepository.findAll(query);
     return {
       items,
@@ -88,7 +114,10 @@ export const userService = {
   },
 
   async remove(id: string): Promise<void> {
-    await getOrFail(id);
+    const user = await getOrFail(id);
+    if (user.role === ROLES.OWNER) {
+      throw new ApiError(422, "OWNER cannot be deleted");
+    }
     await userRepository.delete(id);
   },
 };

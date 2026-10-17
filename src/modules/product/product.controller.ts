@@ -5,6 +5,11 @@ import { ListProductQuery } from "./product.interface";
 import { productService } from "./product.service";
 
 export const productController = {
+  count: catchAsync(async (_req: Request, res: Response) => {
+    const result = await productService.count();
+    sendSuccess(res, result, "Products count retrieved");
+  }),
+
   create: catchAsync(async (req: Request, res: Response) => {
     const product = await productService.create(req.body);
     sendSuccess(res, product, "Product created", 201);

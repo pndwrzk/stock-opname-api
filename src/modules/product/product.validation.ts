@@ -8,6 +8,7 @@ export const productIdParamSchema = z.object({
 export const createProductSchema = z.object({
   sku: z.string().trim().min(1).max(50),
   name: z.string().trim().min(1).max(255),
+  unit: z.string().trim().min(1).max(50).default("pcs"),
   price: z.number({ error: "Price must be a number" }).min(0)
 });
 

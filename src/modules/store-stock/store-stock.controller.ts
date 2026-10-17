@@ -12,6 +12,7 @@ export const storeStockController = {
 
   findAll: catchAsync(async (req: Request, res: Response) => {
     const { items, meta } = await storeStockService.findAll(
+      req.user!!,
       req.query as unknown as ListStoreStockQuery,
     );
     sendSuccess(res, items, "Store stocks retrieved", 200, meta);

@@ -9,6 +9,11 @@ export const authController = {
     sendSuccess(res, result, "Login successful");
   }),
 
+  getMe: catchAsync(async (req: Request, res: Response) => {
+    const user = await authService.getMe(req.user?.id!!);
+    sendSuccess(res, user, "User retrieved successfully");
+  }),
+
   refresh: catchAsync(async (req: Request, res: Response) => {
     const tokens = await authService.refresh(req.body.refreshToken);
     sendSuccess(res, tokens, "Token refreshed");

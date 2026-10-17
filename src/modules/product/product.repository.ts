@@ -2,7 +2,25 @@ import { Prisma, Product } from "@prisma/client";
 import { prisma } from "../../config";
 import { CreateProductDto, ListProductQuery, UpdateProductDto } from "./product.interface";
 
+const productListSelect = {
+  id: true,
+  sku: true,
+  name: true,
+  unit: true,
+  price: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.ProductSelect;
+
+type ProductListItem = Prisma.ProductGetPayload<{
+  select: typeof productListSelect;
+}>;
+
 export const productRepository = {
+  count(): Promise<number> {
+    return prisma.product.count();
+  },
+
   create(data: CreateProductDto): Promise<Product> {
     return prisma.product.create({ data });
   },
@@ -11,7 +29,7 @@ export const productRepository = {
     page,
     limit,
     search,
-  }: ListProductQuery): Promise<{ items: Product[]; total: number }> {
+  }: ListProductQuery): Promise<{ items: ProductListItem[]; total: number }> {
     const where: Prisma.ProductWhereInput = search
       ? {
           OR: [
@@ -24,6 +42,7 @@ export const productRepository = {
     const [items, total] = await prisma.$transaction([
       prisma.product.findMany({
         where,
+        select: productListSelect,
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: "desc" },

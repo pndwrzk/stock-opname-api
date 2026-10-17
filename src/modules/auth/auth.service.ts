@@ -29,16 +29,28 @@ export const authService = {
     }
 
     const user = {
+      nik: found.nik,
       username: found.username,
+      name: found.name,
       id: found.id,
       role: found.role,
       storeId: found.storeId ?? null,
+      createdAt: found.createdAt,
+      updatedAt: found.updatedAt,
     };
 
     return {
       ...issueTokens({ id: user.id, role: user.role, storeId: user.storeId }),
       user,
     };
+  },
+
+  async getMe(userId: string) {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    return user;
   },
 
   async refresh(refreshToken: string) {

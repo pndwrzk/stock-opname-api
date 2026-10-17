@@ -3,6 +3,10 @@ import { prisma } from "../../config";
 import { CreateStoreDto, ListStoreQuery, UpdateStoreDto } from "./store.interface";
 
 export const storeRepository = {
+  count(): Promise<number> {
+    return prisma.store.count();
+  },
+
   create(data: CreateStoreDto): Promise<Store> {
     return prisma.store.create({ data });
   },

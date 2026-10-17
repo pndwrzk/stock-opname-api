@@ -12,7 +12,8 @@
     "prisma:generate": "prisma generate"
   },
   "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "schema": "src/prisma/schema.prisma",
+    "seed": "ts-node-dev --transpile-only src/prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

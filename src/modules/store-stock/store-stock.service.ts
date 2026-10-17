@@ -20,11 +20,6 @@ const getOrFail = async (id: string): Promise<StoreStockDetail> => {
 
 export const storeStockService = {
   async create( actor: AuthUser,dto: CreateStoreStockDto): Promise<StoreStockDetail> {
-
-    if(actor.role === ROLES.STAFF){
-        throw new ApiError(403, "You are not authorized to create store stock");
-    }
-
     if(actor.role === ROLES.MANAGER){
         if(!actor.storeId || actor.storeId !== dto.storeId){
             throw new ApiError(403, "You are not authorized to create store stock for this store");
@@ -52,7 +47,13 @@ export const storeStockService = {
     return storeStockRepository.create(dto);
   },
 
-  async findAll(query: ListStoreStockQuery) {
+  async findAll(actor: AuthUser,query: ListStoreStockQuery) {
+    if(actor.role === ROLES.STAFF || actor.role === ROLES.MANAGER){
+       if(!actor.storeId){
+          throw new ApiError(403, "You are not authorized to view store stock");
+       }
+       query.storeId = actor.storeId;
+    }
     const { items, total } = await storeStockRepository.findAll(query);
     return {
       items,

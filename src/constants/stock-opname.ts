@@ -6,14 +6,16 @@ export type OpnameScope = (typeof OPNAME_SCOPE)[keyof typeof OPNAME_SCOPE];
 
 export const OPNAME_STATUS = {
   INITIATED: 0,
-  SUBMITTED: 1,
-  APPROVED: 2,
-  REJECTED: 3,
+  IN_PROGRESS: 1,
+  SUBMITTED: 2,
+  APPROVED: 3,
+  REJECTED: 4,
 } as const;
 export type OpnameStatus = (typeof OPNAME_STATUS)[keyof typeof OPNAME_STATUS];
 
 export const ACTIVE_OPNAME_STATUSES: OpnameStatus[] = [
   OPNAME_STATUS.INITIATED,
+  OPNAME_STATUS.IN_PROGRESS,
   OPNAME_STATUS.SUBMITTED,
 ];
 

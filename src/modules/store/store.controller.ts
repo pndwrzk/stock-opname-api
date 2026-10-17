@@ -5,6 +5,11 @@ import { storeService } from "./store.service";
 import { ListStoreQuery } from "./store.interface";
 
 export const storeController = {
+  count: catchAsync(async (_req: Request, res: Response) => {
+    const result = await storeService.count();
+    sendSuccess(res, result, "Stores count retrieved");
+  }),
+
   create: catchAsync(async (req: Request, res: Response) => {
     const store = await storeService.create(req.body);
     sendSuccess(res, store, "Store created", 201);
